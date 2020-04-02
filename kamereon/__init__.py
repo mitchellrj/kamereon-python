@@ -152,7 +152,7 @@ class KamereonEntity(Entity):
     @property
     def device_state_attributes(self):
         """Return device specific state attributes."""
-        return dict(
+        return {
             'manufacturer': self.vehicle.session.tenant,
             'vin': self.vehicle.vin,
             'name': self.vehicle.nickname,
@@ -161,7 +161,7 @@ class KamereonEntity(Entity):
             'registration_number': self.vehicle.registration_number,
             'device_picture': self.vehicle.picture_url,
             'first_registration_date': self.vehicle.first_registration_date,
-        )
+        }
 
     @property
     def device_info(self):
