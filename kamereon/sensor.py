@@ -4,7 +4,7 @@ import logging
 from homeassistant.const import (
     DEVICE_CLASS_BATTERY, DEVICE_CLASS_POWER, DEVICE_CLASS_TEMPERATURE,
     DEVICE_CLASS_TIMESTAMP, LENGTH_KILOMETERS, POWER_WATT, STATE_UNKNOWN,
-    TEMP_CELSIUS, UNIT_PERCENTAGE, VOLUME_LITERS)
+    TEMP_CELSIUS, TIME_MINUTES, UNIT_PERCENTAGE, VOLUME_LITERS)
 
 from . import DATA_KEY, KamereonEntity
 from .kamereon import ChargingSpeed
@@ -50,6 +50,11 @@ class BatteryLevelSensor(KamereonEntity):
     @property
     def _entity_name(self):
         return 'battery level'
+
+    @property
+    def unit_of_measurement(self):
+        """Return the unit of measurement."""
+        return UNIT_PERCENTAGE
 
     @property
     def device_class(self):
@@ -229,6 +234,11 @@ class ChargeTimeRequiredSensor(KamereonEntity):
         self.charging_speed = charging_speed
 
     @property
+    def unit_of_measurement(self):
+        """Return the unit of measurement."""
+        return TIME_MINUTES
+
+    @property
     def _entity_name(self):
         return 'charging time required to full ({})'.format(self.CHARGING_SPEED_NAME[self.charging_speed])
 
@@ -313,4 +323,4 @@ class TimestampSensor(KamereonEntity):
         val = getattr(self.vehicle, self.attribute)
         if val is None:
             return STATE_UNKNOWN
-        return val
+        return val.isoformat()
