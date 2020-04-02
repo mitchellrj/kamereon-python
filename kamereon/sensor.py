@@ -193,7 +193,7 @@ class ChargingPowerSensor(KamereonEntity):
     @property
     def device_state_attributes(self):
         """Return device specific state attributes."""
-        a = KamereonEntity.device_state_attributes(self)
+        a = KamereonEntity.device_state_attributes.fget(self)
         a.update({
             'battery_capacity': self.vehicle.battery_capacity,
             'battery_bar_level': self.vehicle.battery_bar_level,
