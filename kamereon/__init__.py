@@ -1,4 +1,5 @@
 """Support for Kamereon-supporting cars."""
+import asyncio
 from datetime import timedelta
 import logging
 
@@ -61,16 +62,23 @@ CONFIG_SCHEMA = vol.Schema(
 async def async_setup(hass, config):
     """Set up the Kamereon component."""
     session = async_get_clientsession(hass)
+    entry_setup = []
+    for config_entry in config[DOMAIN]:
+        entry_setup.append(_async_setup_entry(hass, config_entry, session))
 
-    mfr_session_class = MANUFACTURERS[config[DOMAIN].get(CONF_MANUFACTURER)]
+    await asyncio.gather(*entry_setup)
+
+async def _async_setup_entry(hass, config, session):
+
+    mfr_session_class = MANUFACTURERS[config.get(CONF_MANUFACTURER)]
     kamereon_session = mfr_session_class(
-        region=config[DOMAIN].get(CONF_REGION),
-        session=session,
+        region=config.get(CONF_REGION)
+        #session=session,
     )
 
-    interval = config[DOMAIN][CONF_SCAN_INTERVAL]
+    interval = config[CONF_SCAN_INTERVAL]
 
-    hass.data[DATA_KEY] = kamereon_session
+    data = hass.data[DATA_KEY] = {}
 
     def discover_vehicle(vehicle):
         """Load relevant platforms."""
@@ -85,6 +93,8 @@ async def async_setup(hass, config):
                     config,
                 )
             )
+        
+        data[vehicle.vin] = vehicle
 
     async def update(now):
         """Update status from the online service."""
@@ -103,8 +113,8 @@ async def async_setup(hass, config):
 
     _LOGGER.info("Logging in to service")
     kamereon_session.login(
-        username=config[DOMAIN].get(CONF_USERNAME),
-        password=config[DOMAIN].get(CONF_PASSWORD)
+        username=config.get(CONF_USERNAME),
+        password=config.get(CONF_PASSWORD)
         )
     return await update(utcnow())
 
