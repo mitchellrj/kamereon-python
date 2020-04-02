@@ -2,7 +2,7 @@
     "domain": "kamereon",
     "name": "Kamereon",
     "documentation": "https://github.com/mitchellrj/kamereon-python",
-    "requirements": ["aioauth-client"],
+    "requirements": ["requests", "requests_oauthlib", "pytz"],
     "dependencies": [],
     "codeowners": []
   }
