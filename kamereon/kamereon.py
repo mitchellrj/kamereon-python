@@ -818,14 +818,20 @@ class Vehicle:
             }),
             headers={'Content-Type': 'application/vnd.api+json'}
         )
-        return resp.json()
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        return body
 
     def fetch_location(self):
         resp = self.session.oauth.get(
             '{}v1/cars/{}/location'.format(self.session.settings['car_adapter_base_url'], self.vin),
             headers={'Content-Type': 'application/vnd.api+json'}
         )
-        location_data = resp.json()['data']['attributes']
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        location_data = body['data']['attributes']
         self.location = (location_data['gpsLatitude'], location_data['gpsLongitude'])
         self.location_last_updated = datetime.datetime.fromisoformat(location_data['lastUpdateTime'].replace('Z','+00:00'))
 
@@ -837,7 +843,10 @@ class Vehicle:
             }),
             headers={'Content-Type': 'application/vnd.api+json'}
         )
-        return resp.json()
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        return body
 
     def fetch_lock_status(self):
         if Feature.LOCK_STATUS_CHECK not in self.features:
@@ -846,7 +855,10 @@ class Vehicle:
             '{}v1/cars/{}/lock-status'.format(self.session.settings['car_adapter_base_url'], self.vin),
             headers={'Content-Type': 'application/vnd.api+json'}
         )
-        lock_data = resp.json()['data']['attributes']
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        lock_data = body['data']['attributes']
         self.door_status[Door.FRONT_LEFT] = LockStatus(lock_data['doorStatusFrontLeft'])
         self.door_status[Door.FRONT_RIGHT] = LockStatus(lock_data['doorStatusFrontRight'])
         self.door_status[Door.REAR_LEFT] = LockStatus(lock_data['doorStatusRearLeft'])
@@ -863,7 +875,10 @@ class Vehicle:
             }),
             headers={'Content-Type': 'application/vnd.api+json'}
         )
-        return resp.json()
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        return body
 
     def initiate_srp(self):
         (salt, verifier) = SRP.enroll(self.user_id, self.vin)
@@ -881,7 +896,10 @@ class Vehicle:
             }),
             headers={'Content-Type': 'application/vnd.api+json'}
         )
-        return resp.json()
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        return body
 
     def validate_srp(self):
         a = SRP.generate_a()
@@ -898,7 +916,10 @@ class Vehicle:
             }),
             headers={'Content-Type': 'application/vnd.api+json'}
         )
-        return resp.json()
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        return body
 
     """
     Other vehicle controls to implement / investigate:
@@ -938,7 +959,10 @@ class Vehicle:
             }),
             headers={'Content-Type': 'application/vnd.api+json'}
         )
-        return resp.json()
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        return body
 
     def control_horn_lights(self, action: str, target: str, duration: int=5, srp: str=None):
         if Feature.HORN_AND_LIGHTS not in self.features:
@@ -962,7 +986,10 @@ class Vehicle:
             }),
             headers={'Content-Type': 'application/vnd.api+json'}
         )
-        return resp.json()
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        return body
 
     def set_hvac_status(self, action: HVACAction, target_temperature: int=21, start: datetime.datetime=None, srp: str=None):
         if Feature.CLIMATE_ON_OFF not in self.features:
@@ -991,7 +1018,10 @@ class Vehicle:
             }),
             headers={'Content-Type': 'application/vnd.api+json'}
         )
-        return resp.json()
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        return body
 
     def lock_unlock(self, srp: str, action: str, group: LockableDoorGroup=None):
         if Feature.APP_DOOR_LOCKING not in self.features:
@@ -1013,7 +1043,10 @@ class Vehicle:
             }),
             headers={'Content-Type': 'application/vnd.api+json'}
         )
-        return resp.json()
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        return body
 
     def lock(self, srp: str, group: LockableDoorGroup=None):
         return self.lock_unlock(srp, 'lock', group)
@@ -1026,7 +1059,10 @@ class Vehicle:
             '{}v1/cars/{}/hvac-status'.format(self.session.settings['car_adapter_base_url'], self.vin),
             headers={'Content-Type': 'application/vnd.api+json'}
         )
-        hvac_data = resp.json()['data']['attributes']
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        hvac_data = body['data']['attributes']
         self.external_temperature = hvac_data.get('externalTemperature')
         self.internal_temperature = hvac_data.get('internalTemperature')
         if 'hvacStatus' in hvac_data:
@@ -1044,7 +1080,10 @@ class Vehicle:
             }),
             headers={'Content-Type': 'application/vnd.api+json'}
         )
-        return resp.json()
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        return body
 
     def fetch_battery_status(self):
         if Feature.BATTERY_STATUS not in self.features:
@@ -1053,7 +1092,10 @@ class Vehicle:
             '{}v1/cars/{}/battery-status'.format(self.session.settings['car_adapter_base_url'], self.vin),
             headers={'Content-Type': 'application/vnd.api+json'}
         )
-        battery_data = resp.json()['data']['attributes']
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        battery_data = body['data']['attributes']
         self.battery_capacity = battery_data['batteryCapacity']  # kWh
         self.battery_level = battery_data['batteryLevel']  # %
         self.battery_temperature = battery_data.get('batteryTemperature')  # Fahrenheit?
@@ -1080,10 +1122,13 @@ class Vehicle:
         resp = self.session.oauth.get(
             '{}v1/cars/{}/energy-unit-cost'.format(self.session.settings['car_adapter_base_url'], self.vin)
         )
-        energy_cost_data = resp.json()['data']['attributes']
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        energy_cost_data = body['data']['attributes']
         self.electricity_unit_cost = energy_cost_data.get('electricityUnitCost')
         self.combustion_fuel_unit_cost = energy_cost_data.get('fuelUnitCost')
-        return resp.json()
+        return body
 
     def set_energy_unit_cost(self, cost):
         resp = self.session.oauth.post(
@@ -1094,6 +1139,9 @@ class Vehicle:
                 }
             })
         )
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
 
     def fetch_trip_histories(self, period: Period=None, start: datetime.date=None, end: datetime.date=None):
         if period is None:
@@ -1110,7 +1158,10 @@ class Vehicle:
                 'end': end.isoformat()
             }
         )
-        return [TripSummary(s, self.vin) for s in resp.json()['data']['attributes']['summaries']]
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        return [TripSummary(s, self.vin) for s in body['data']['attributes']['summaries']]
 
     def fetch_notifications(
             self,
@@ -1150,7 +1201,10 @@ class Vehicle:
             '{}v2/notifications/users/{}/vehicles/{}'.format(self.session.settings['notifications_base_url'], self.user_id, self.vin),
             params=params
         )
-        return [Notification(m, language, self.vin) for m in resp.json()['data']['attributes']['messages']]
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        return [Notification(m, language, self.vin) for m in body['data']['attributes']['messages']]
 
     def mark_notifications(self, messages: List[Notification]):
         """Take a list of notifications and set their status remotely
@@ -1163,7 +1217,10 @@ class Vehicle:
                 for m in messages
             ])
         )
-        return resp.json()
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+        return body
 
     def fetch_notification_settings(self, language: Language=None):
         if language is None:
@@ -1175,9 +1232,12 @@ class Vehicle:
             '{}v1/rules/settings/users/{}/vehicles/{}'.format(self.session.settings['notifications_base_url'], self.user_id, self.vin),
             params=params
         )
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
         return [
             NotificationRule(r, language, self.vin)
-            for r in resp.json()['settings']
+            for r in body['settings']
         ]
 
     def update_notification_settings(self):
@@ -1188,7 +1248,11 @@ class Vehicle:
         resp = self.session.oauth.get(
             "{}v1/cars/{}/cockpit".format(self.session.settings['car_adapter_base_url'], self.vin)
         )
-        cockpit_data = resp.json()['data']['attributes']
+        body = resp.json()
+        if 'errors' in body:
+            raise ValueError(body['errors'])
+
+        cockpit_data = body['data']['attributes']
         self.eco_score = cockpit_data.get('ecoScore')
         self.fuel_autonomy = cockpit_data.get('fuelAutonomy')
         self.fuel_consumption = cockpit_data.get('fuelConsumption')

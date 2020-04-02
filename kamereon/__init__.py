@@ -102,7 +102,7 @@ async def _async_setup_entry(hass, config, session):
 
             for vehicle in kamereon_session.fetch_vehicles():
                 vehicle.refresh()
-                if vehicle.vin not in data.vehicles:
+                if vehicle.vin not in data:
                     discover_vehicle(vehicle)
 
             async_dispatcher_send(hass, SIGNAL_STATE_UPDATED)
