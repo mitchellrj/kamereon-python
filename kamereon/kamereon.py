@@ -608,6 +608,7 @@ class KamereonSession:
             session = requests.session()
         self.session = session
         self._oauth = None
+        self._user_id = None
         # ugly hack
         os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -688,14 +689,15 @@ class KamereonSession:
             raise RuntimeError('No access token set, you need to log in first.')
         return self._oauth
 
-    def get_user_id(self):
-        resp = self.oauth.get(
-            '{}v1/users/current'.format(self.settings['user_adapter_base_url'])
-        )
-        user_id = resp.json()['userId']
-        self.user_id = user_id
-        _registry[USERS][user_id] = self
-        return user_id
+    @property
+    def user_id(self):
+        if not self._user_id:
+            resp = self.oauth.get(
+                '{}v1/users/current'.format(self.settings['user_adapter_base_url'])
+            )
+            self._user_id = resp.json()['userId']
+            _registry[USERS][self._user_id] = self
+        return self._user_id
 
     def fetch_vehicles(self):
         resp = self.oauth.get(
