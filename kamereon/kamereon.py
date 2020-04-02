@@ -531,11 +531,11 @@ class NotificationRuleKey(enum.Enum):
 
 class NotificationPriority(enum.Enum):
 
-    NONE = 'null'
-    P0 = '0'
-    P1 = '1'
-    P2 = '2'
-    P3 = '3'
+    NONE = None
+    P0 = 0
+    P1 = 1
+    P2 = 2
+    P3 = 3
 
 
 class NotificationRuleStatus(enum.Enum):
