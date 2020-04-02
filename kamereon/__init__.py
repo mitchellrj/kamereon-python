@@ -66,7 +66,7 @@ async def async_setup(hass, config):
     for config_entry in config[DOMAIN]:
         entry_setup.append(_async_setup_entry(hass, config_entry, session))
 
-    await asyncio.gather(*entry_setup)
+    return all(await asyncio.gather(*entry_setup))
 
 async def _async_setup_entry(hass, config, session):
 
