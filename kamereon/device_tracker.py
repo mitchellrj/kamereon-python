@@ -17,7 +17,7 @@ async def async_setup_scanner(hass, config, async_see, vehicle=None):
 
     async def see_vehicle():
         """Handle the reporting of the vehicle position."""
-        host_name = slugify(vehicle.nickname)
+        host_name = slugify(vehicle.nickname or vehicle.model_name)
         await async_see(
             dev_id=host_name,
             host_name=host_name,
@@ -27,7 +27,7 @@ async def async_setup_scanner(hass, config, async_see, vehicle=None):
                 'last_updated': vehicle.location_last_updated,
                 'manufacturer': vehicle.session.tenant,
                 'vin': vehicle.vin,
-                'name': vehicle.nickname,
+                'name': vehicle.nickname or vehicle.model_name,
                 'model': vehicle.model_name,
                 'registration_number': vehicle.registration_number,
             },

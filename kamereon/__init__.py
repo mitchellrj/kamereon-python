@@ -143,7 +143,7 @@ class KamereonEntity(Entity):
 
     @property
     def _vehicle_name(self):
-        return self.vehicle.nickname
+        return self.vehicle.nickname or self.vehicle.model_name
 
     @property
     def name(self):
@@ -166,7 +166,7 @@ class KamereonEntity(Entity):
         return {
             'manufacturer': self.vehicle.session.tenant,
             'vin': self.vehicle.vin,
-            'name': self.vehicle.nickname,
+            'name': self.vehicle.nickname or self.vehicle.model_name,
             'model': self.vehicle.model_name,
             'color': self.vehicle.color,
             'registration_number': self.vehicle.registration_number,
