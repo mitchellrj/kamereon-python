@@ -24,7 +24,7 @@ async def async_setup_scanner(hass, config, async_see, vehicle=None):
             source_type=SOURCE_TYPE_GPS,
             gps=vehicle.location,
             attributes={
-                'last_updated': vehicle.location_last_updated,
+                'last_updated': vehicle.location_last_updated.isoformat(),
                 'manufacturer': vehicle.session.tenant,
                 'vin': vehicle.vin,
                 'name': vehicle.nickname or vehicle.model_name,
