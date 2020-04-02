@@ -3,7 +3,6 @@ from datetime import timedelta
 import logging
 
 import voluptuous as vol
-from kamereon import NCISession
 
 from homeassistant.const import (
     CONF_PASSWORD,
@@ -20,6 +19,8 @@ from homeassistant.helpers.dispatcher import (
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import async_track_point_in_utc_time
 from homeassistant.util.dt import utcnow
+
+from .kamereon import NCISession
 
 DOMAIN = "kamereon"
 
