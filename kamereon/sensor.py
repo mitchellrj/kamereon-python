@@ -3,8 +3,8 @@ import logging
 
 from homeassistant.const import (
     DEVICE_CLASS_BATTERY, DEVICE_CLASS_POWER, DEVICE_CLASS_TEMPERATURE,
-    DEVICE_CLASS_TIMESTAMP, LENGTH_KILOMETERS, POWER_WATT, TEMP_CELSIUS,
-    UNIT_PERCENTAGE, VOLUME_LITERS)
+    DEVICE_CLASS_TIMESTAMP, LENGTH_KILOMETERS, POWER_WATT, STATE_UNKNOWN,
+    TEMP_CELSIUS, UNIT_PERCENTAGE, VOLUME_LITERS)
 
 from . import DATA_KEY, KamereonEntity
 from .kamereon import ChargingSpeed
@@ -24,7 +24,6 @@ async def async_setup_platform(hass, config, async_add_entities, vehicle=None):
         ChargeTimeRequiredSensor(vehicle, ChargingSpeed.FAST),
         ChargeTimeRequiredSensor(vehicle, ChargingSpeed.NORMAL),
         ChargeTimeRequiredSensor(vehicle, ChargingSpeed.SLOW),
-        InternalTemperatureSensor(vehicle),
         ExternalTemperatureSensor(vehicle),
         RangeSensor(vehicle, hvac=True),
         RangeSensor(vehicle, hvac=False),
@@ -60,7 +59,7 @@ class BatteryLevelSensor(KamereonEntity):
     @property
     def device_state_attributes(self):
         """Return device specific state attributes."""
-        a = KamereonEntity.device_state_attributes(self)
+        a = KamereonEntity.device_state_attributes.fget(self)
         a.update({
             'battery_capacity': self.vehicle.battery_capacity,
             'battery_bar_level': self.vehicle.battery_bar_level,
@@ -73,6 +72,8 @@ class FuelLevelSensor(KamereonEntity):
     @property
     def state(self):
         """Return the state."""
+        if self.vehicle.fuel_level is None:
+            return STATE_UNKNOWN
         return self.vehicle.fuel_level
 
     @property
@@ -91,6 +92,8 @@ class FuelQuantitySensor(KamereonEntity):
     @property
     def state(self):
         """Return the state."""
+        if self.vehicle.fuel_quantity is None:
+            return STATE_UNKNOWN
         return self.vehicle.fuel_quantity
 
     @property
@@ -109,6 +112,8 @@ class BatteryTemperatureSensor(KamereonEntity):
     @property
     def state(self):
         """Return the state."""
+        if self.vehicle.battery_temperature is None:
+            return STATE_UNKNOWN
         return self.vehicle.battery_temperature
 
     @property
@@ -128,7 +133,7 @@ class BatteryTemperatureSensor(KamereonEntity):
     @property
     def device_state_attributes(self):
         """Return device specific state attributes."""
-        a = KamereonEntity.device_state_attributes(self)
+        a = KamereonEntity.device_state_attributes.fget(self)
         a.update({
             'battery_capacity': self.vehicle.battery_capacity,
             'battery_bar_level': self.vehicle.battery_bar_level,
@@ -142,34 +147,13 @@ class ExternalTemperatureSensor(KamereonEntity):
     @property
     def state(self):
         """Return the state."""
+        if self.vehicle.external_temperature is None:
+            return STATE_UNKNOWN
         return self.vehicle.external_temperature
 
     @property
     def _entity_name(self):
         return 'external temperature'
-
-    @property
-    def unit_of_measurement(self):
-        """Return the unit of measurement."""
-        return TEMP_CELSIUS
-
-    @property
-    def device_class(self):
-        """Return the class of this sensor."""
-        return DEVICE_CLASS_TEMPERATURE
-
-
-class InternalTemperatureSensor(KamereonEntity):
-    """Representation of a Kamereon car sensor."""
-
-    @property
-    def state(self):
-        """Return the state."""
-        return self.vehicle.internal_temperature
-
-    @property
-    def _entity_name(self):
-        return 'internal temperature'
 
     @property
     def unit_of_measurement(self):
@@ -188,6 +172,8 @@ class ChargingPowerSensor(KamereonEntity):
     @property
     def state(self):
         """Return the state."""
+        if self.vehicle.instantaneous_power is None:
+            return STATE_UNKNOWN
         return self.vehicle.instantaneous_power * 1000
 
     @property
@@ -224,6 +210,8 @@ class ChargingSpeedSensor(KamereonEntity):
     @property
     def state(self):
         """Return the state."""
+        if self.vehicle.charging_speed is None:
+            return STATE_UNKNOWN
         return self.vehicle.charging_speed.value
 
 
@@ -247,7 +235,9 @@ class ChargeTimeRequiredSensor(KamereonEntity):
     @property
     def state(self):
         """Return the state."""
-        return self.CHARGING_SPEED_NAME[self.vehicle.charge_time_required_to_full[self.charging_speed]]
+        if self.vehicle.charge_time_required_to_full[self.charging_speed] is None:
+            return STATE_UNKNOWN
+        return self.vehicle.charge_time_required_to_full[self.charging_speed]
 
 
 class RangeSensor(KamereonEntity):
@@ -269,7 +259,10 @@ class RangeSensor(KamereonEntity):
     @property
     def state(self):
         """Return the state."""
-        return getattr(self.vehicle, 'range_hvac_{}'.format('on' if self.hvac else 'off'))
+        val = getattr(self.vehicle, 'range_hvac_{}'.format('on' if self.hvac else 'off'))
+        if val is None:
+            return STATE_UNKNOWN
+        return val
 
 
 class MileageSensor(KamereonEntity):
@@ -291,7 +284,10 @@ class MileageSensor(KamereonEntity):
     @property
     def state(self):
         """Return the state."""
-        return getattr(self.vehicle, '{}mileage'.format('total_' if self.total else ''))
+        val = getattr(self.vehicle, '{}mileage'.format('total_' if self.total else ''))
+        if val is None:
+            return STATE_UNKNOWN
+        return val
 
 
 class TimestampSensor(KamereonEntity):
@@ -314,4 +310,7 @@ class TimestampSensor(KamereonEntity):
     @property
     def state(self):
         """Return the state."""
-        return getattr(self.vehicle, self.attribute)
+        val = getattr(self.vehicle, self.attribute)
+        if val is None:
+            return STATE_UNKNOWN
+        return val

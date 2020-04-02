@@ -5,7 +5,7 @@ import logging
 
 from homeassistant.components.climate import ClimateDevice
 from homeassistant.components.climate.const import (HVAC_MODE_HEAT_COOL, HVAC_MODE_OFF, SUPPORT_TARGET_TEMPERATURE)
-from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS, STATE_UNKNOWN
+from homeassistant.const import ATTR_TEMPERATURE, STATE_UNKNOWN, TEMP_CELSIUS
 
 SUPPORT_HVAC = [HVAC_MODE_HEAT_COOL, HVAC_MODE_OFF]
 
@@ -36,7 +36,9 @@ class KamereonClimate(KamereonEntity, ClimateDevice):
         """Return hvac operation ie. heat, cool mode.
         Need to be one of HVAC_MODE_*.
         """
-        if self.vehicle.hvac_status is HVACStatus.ON:
+        if self.vehicle.hvac_status is None:
+            return STATE_UNKNOWN
+        elif self.vehicle.hvac_status is HVACStatus.ON:
             return HVAC_MODE_HEAT_COOL
         return HVAC_MODE_OFF
 
@@ -52,6 +54,14 @@ class KamereonClimate(KamereonEntity, ClimateDevice):
     def temperature_unit(self):
         """Return the unit of measurement."""
         return TEMP_CELSIUS
+
+    @property
+    def current_temperature(self):
+        """Return the current temperature."""
+        if self.vehicle.internal_temperature:
+            return float(self.vehicle.internal_temperature)
+        else:
+            return STATE_UNKNOWN
 
     @property
     def target_temperature(self):

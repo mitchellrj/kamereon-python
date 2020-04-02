@@ -12,7 +12,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     """Set up a Kamereon car switch."""
     if discovery_info is None:
         return
-    async_add_entities([KamereonSwitch(discovery_info)])
+    #async_add_entities([KamereonSwitch(discovery_info)])
 
 
 class KamereonSwitch(KamereonEntity, ToggleEntity):

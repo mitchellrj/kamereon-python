@@ -39,7 +39,7 @@ class KamereonLock(KamereonEntity, LockDevice):
 
     @property
     def device_state_attributes(self):
-        a = KamereonEntity.device_state_attributes(self)
+        a = KamereonEntity.device_state_attributes.fget(self)
         a.update({
             'last_updated': self.vehicle.lock_status_last_updated,
             'lock_status': self.vehicle.lock_status.value,

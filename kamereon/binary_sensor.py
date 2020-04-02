@@ -2,6 +2,7 @@
 import logging
 
 from homeassistant.components.binary_sensor import DEVICE_CLASSES, BinarySensorDevice
+from homeassistant.const import STATE_UNKNOWN
 
 from . import KamereonEntity
 from .kamereon import ChargingStatus, Door, LockStatus, PluggedStatus
@@ -40,6 +41,8 @@ class ChargingStatusEntity(KamereonEntity, BinarySensorDevice):
     @property
     def is_on(self):
         """Return True if the binary sensor is on."""
+        if self.vehicle.charging is None:
+            return STATE_UNKNOWN
         return self.vehicle.charging is ChargingStatus.CHARGING
 
     @property
@@ -49,7 +52,7 @@ class ChargingStatusEntity(KamereonEntity, BinarySensorDevice):
 
     @property
     def device_state_attributes(self):
-        a = KamereonEntity.device_state_attributes(self)
+        a = KamereonEntity.device_state_attributes.fget(self)
         a.update({
             'charging_speed': self.vehicle.charging_speed.value,
             'last_updated': self.vehicle.battery_status_last_updated,
@@ -72,6 +75,8 @@ class PluggedStatusEntity(KamereonEntity, BinarySensorDevice):
     @property
     def is_on(self):
         """Return True if the binary sensor is on."""
+        if self.vehicle.plugged_in is None:
+            return STATE_UNKNOWN
         return self.vehicle.plugged_in is PluggedStatus.PLUGGED
 
     @property
@@ -81,7 +86,7 @@ class PluggedStatusEntity(KamereonEntity, BinarySensorDevice):
 
     @property
     def device_state_attributes(self):
-        a = KamereonEntity.device_state_attributes(self)
+        a = KamereonEntity.device_state_attributes.fget(self)
         a.update({
             'plugged_in_time': self.vehicle.plugged_in_time,
             'unplugged_time': self.vehicle.unplugged_time,
@@ -105,6 +110,8 @@ class FuelLowWarningEntity(KamereonEntity, BinarySensorDevice):
     @property
     def is_on(self):
         """Return True if the binary sensor is on."""
+        if self.vehicle.fuel_low_warning is None:
+            return STATE_UNKNOWN
         return self.vehicle.fuel_low_warning
 
     @property
@@ -132,7 +139,9 @@ class DoorEntity(KamereonEntity, BinarySensorDevice):
     @property
     def is_on(self):
         """Return True if the binary sensor is open."""
-        self.vehicle.door_status[self.door] == LockStatus.OPEN
+        if self.door not in self.vehicle.door_status or self.vehicle.door_status[self.door] is None:
+            return STATE_UNKNOWN
+        return self.vehicle.door_status[self.door] == LockStatus.OPEN
 
     @property
     def device_class(self):
