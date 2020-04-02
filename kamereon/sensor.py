@@ -45,7 +45,7 @@ class BatteryLevelSensor(KamereonEntity):
     @property
     def state(self):
         """Return the state."""
-        return self.vehicle.battery_level
+        return self.vehicle.battery_bar_level
 
     @property
     def _entity_name(self):
@@ -67,7 +67,7 @@ class BatteryLevelSensor(KamereonEntity):
         a = KamereonEntity.device_state_attributes.fget(self)
         a.update({
             'battery_capacity': self.vehicle.battery_capacity,
-            'battery_bar_level': self.vehicle.battery_bar_level,
+            'battery_level': self.vehicle.battery_level,
         })
 
 
