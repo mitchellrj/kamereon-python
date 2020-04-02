@@ -60,16 +60,14 @@ class KamereonClimate(KamereonEntity, ClimateDevice):
         """Return the current temperature."""
         if self.vehicle.internal_temperature:
             return float(self.vehicle.internal_temperature)
-        else:
-            return STATE_UNKNOWN
+        return None
 
     @property
     def target_temperature(self):
         """Return the temperature we try to reach."""
-        if self.vehicle.next_target_temperature:
+        if self.vehicle.next_target_temperature is not None:
             return float(self.vehicle.next_target_temperature)
-        else:
-            return STATE_UNKNOWN
+        return None
 
     def set_temperature(self, **kwargs):
         """Set new target temperatures."""
