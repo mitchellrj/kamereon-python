@@ -10,7 +10,7 @@ from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS, STATE_UNKNOWN
 SUPPORT_HVAC = [HVAC_MODE_HEAT_COOL, HVAC_MODE_OFF]
 
 from . import KamereonEntity
-from .kamereon import HVACAction, HVACStatus
+from .kamereon import Feature, HVACAction, HVACStatus
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -19,7 +19,8 @@ def setup_platform(hass, config, add_devices, vehicle=None):
     """ Setup the volkswagen climate."""
     if vehicle is None:
         return
-    add_devices([KamereonClimate(vehicle)])
+    if Feature.TEMPERATURE in vehicle.features or Feature.INTERIOR_TEMP_SETTINGS in vehicle.features:
+        add_devices([KamereonClimate(vehicle)])
 
 
 class KamereonClimate(KamereonEntity, ClimateDevice):
@@ -62,6 +63,9 @@ class KamereonClimate(KamereonEntity, ClimateDevice):
 
     def set_temperature(self, **kwargs):
         """Set new target temperatures."""
+        if Feature.TEMPERATURE not in self.vehicle.features:
+            raise NotImplementedError()
+
         _LOGGER.debug("Setting temperature for: %s", self.instrument.attr)
         temperature = kwargs.get(ATTR_TEMPERATURE)
         if temperature:
@@ -69,6 +73,9 @@ class KamereonClimate(KamereonEntity, ClimateDevice):
 
     def set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
+        if Feature.CLIMATE_ON_OFF not in self.vehicle.features:
+            raise NotImplementedError()
+
         _LOGGER.debug("Setting mode for: %s", self.instrument.attr)
         if hvac_mode == HVAC_MODE_OFF:
             self.vehicle.set_hvac_status(HVACAction.STOP)
