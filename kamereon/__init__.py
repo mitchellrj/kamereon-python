@@ -139,7 +139,7 @@ class KamereonEntity(Entity):
 
     @property
     def _entity_name(self):
-        return NotImplemented
+        return None
 
     @property
     def _vehicle_name(self):
@@ -148,6 +148,8 @@ class KamereonEntity(Entity):
     @property
     def name(self):
         """Return full name of the entity."""
+        if not self._entity_name:
+            return self._vehicle_name
         return f"{self._vehicle_name} {self._entity_name}"
 
     @property
