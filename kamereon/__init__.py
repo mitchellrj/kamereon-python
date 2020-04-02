@@ -40,19 +40,19 @@ MANUFACTURERS = {
     'nissan': NCISession,
 }
 
+SUB_SCHEMA = vol.Schema({
+    vol.Required(CONF_MANUFACTURER): vol.All(cv.string, vol.In(MANUFACTURERS)),
+    vol.Required(CONF_USERNAME): cv.string,
+    vol.Required(CONF_PASSWORD): cv.string,
+    vol.Optional(
+        CONF_SCAN_INTERVAL, default=DEFAULT_UPDATE_INTERVAL
+    ): vol.All(cv.time_period, vol.Clamp(min=MIN_UPDATE_INTERVAL)),
+    vol.Optional(CONF_REGION): cv.string,
+})
+
 CONFIG_SCHEMA = vol.Schema(
     {
-        DOMAIN: vol.Schema(
-            {
-                vol.Required(CONF_MANUFACTURER): vol.All(cv.string, [vol.In(MANUFACTURERS)]),
-                vol.Required(CONF_USERNAME): cv.string,
-                vol.Required(CONF_PASSWORD): cv.string,
-                vol.Optional(
-                    CONF_SCAN_INTERVAL, default=DEFAULT_UPDATE_INTERVAL
-                ): vol.All(cv.time_period, vol.Clamp(min=MIN_UPDATE_INTERVAL)),
-                vol.Optional(CONF_REGION): cv.string,
-            }
-        )
+        vol.Optional(DOMAIN): vol.All(cv.ensure_list, [SUB_SCHEMA])
     },
     extra=vol.ALLOW_EXTRA,
 )
