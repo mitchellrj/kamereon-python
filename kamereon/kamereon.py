@@ -739,7 +739,7 @@ class Vehicle:
             for f in s['features']:
                 if f['state'] != 'ACTIVATED':
                     continue
-                features.append(Feature(f['id']))
+                self.features.append(Feature(f['id']))
         self.can_generation = data.get('canGeneration')
         self.color = data.get('color')
         self.energy = data.get('energy')

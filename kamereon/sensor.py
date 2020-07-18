@@ -46,7 +46,7 @@ class BatteryLevelSensor(KamereonEntity):
     @property
     def state(self):
         """Return the state."""
-        return self.vehicle.battery_bar_level
+        return self.vehicle.battery_level
 
     @property
     def _entity_name(self):
