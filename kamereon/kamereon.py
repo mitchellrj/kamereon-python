@@ -732,10 +732,14 @@ class Vehicle:
     def __init__(self, data, user_id):
         self.user_id = user_id
         self.vin = data['vin'].upper()
-        self.features = [
-            Feature(u['name'])
-            for u in data.get('uids', [])
-            if u['enabled']]
+        self.features = []
+        for s in data.get('services', []):
+            if s['activationState'] != 'ACTIVATED':
+                continue
+            for f in s['features']:
+                if f['state'] != 'ACTIVATED':
+                    continue
+                features.append(Feature(f['id']))
         self.can_generation = data.get('canGeneration')
         self.color = data.get('color')
         self.energy = data.get('energy')
