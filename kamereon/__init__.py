@@ -89,7 +89,7 @@ async def _async_setup_entry(hass, config, session):
                     hass,
                     component,
                     DOMAIN,
-                    vehicle,
+                    vehicle.vin,
                     config,
                 )
             )

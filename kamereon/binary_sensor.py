@@ -4,16 +4,17 @@ import logging
 from homeassistant.components.binary_sensor import DEVICE_CLASSES, BinarySensorDevice
 from homeassistant.const import STATE_UNKNOWN
 
-from . import KamereonEntity
+from . import DATA_KEY, KamereonEntity
 from .kamereon import ChargingStatus, Door, LockStatus, PluggedStatus
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_platform(hass, config, async_add_entities, vehicle=None):
+async def async_setup_platform(hass, config, async_add_entities, vin=None):
     """Set up the Kamereon sensors."""
-    if vehicle is None:
+    if vin is None:
         return
+    vehicle = hass.data[DATA_KEY][vin]
     async_add_entities([
         ChargingStatusEntity(vehicle),
         PluggedStatusEntity(vehicle),

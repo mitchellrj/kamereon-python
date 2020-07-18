@@ -5,15 +5,16 @@ from homeassistant.components.device_tracker import SOURCE_TYPE_GPS
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.util import slugify
 
-from . import SIGNAL_STATE_UPDATED
+from . import DATA_KEY, SIGNAL_STATE_UPDATED
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_scanner(hass, config, async_see, vehicle=None):
+async def async_setup_scanner(hass, config, async_see, vin=None):
     """Set up the Kamereon tracker."""
-    if vehicle is None:
+    if vin is None:
         return
+    vehicle = hass.data[DATA_KEY][vin]
 
     async def see_vehicle():
         """Handle the reporting of the vehicle position."""

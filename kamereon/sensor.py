@@ -12,10 +12,11 @@ from .kamereon import ChargingSpeed
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_platform(hass, config, async_add_entities, vehicle=None):
+async def async_setup_platform(hass, config, async_add_entities, vin=None):
     """Set up the Kamereon sensors."""
-    if vehicle is None:
+    if vin is None:
         return
+    vehicle = hass.data[DATA_KEY][vin]
     async_add_entities([
         BatteryLevelSensor(vehicle),
         BatteryTemperatureSensor(vehicle),

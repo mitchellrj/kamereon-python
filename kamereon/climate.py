@@ -9,16 +9,17 @@ from homeassistant.const import ATTR_TEMPERATURE, STATE_UNKNOWN, TEMP_CELSIUS
 
 SUPPORT_HVAC = [HVAC_MODE_HEAT_COOL, HVAC_MODE_OFF]
 
-from . import KamereonEntity
+from . import DATA_KEY, KamereonEntity
 from .kamereon import Feature, HVACAction, HVACStatus
 
 _LOGGER = logging.getLogger(__name__)
 
 
-def setup_platform(hass, config, add_devices, vehicle=None):
+def setup_platform(hass, config, add_devices, vin=None):
     """ Setup the volkswagen climate."""
-    if vehicle is None:
+    if vin is None:
         return
+    vehicle = hass.data[DATA_KEY][vin]
     if Feature.TEMPERATURE in vehicle.features or Feature.INTERIOR_TEMP_SETTINGS in vehicle.features:
         add_devices([KamereonClimate(vehicle)])
 

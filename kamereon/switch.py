@@ -8,10 +8,11 @@ from . import DATA_KEY, KamereonEntity
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+async def async_setup_platform(hass, config, async_add_entities, vin=None):
     """Set up a Kamereon car switch."""
-    if discovery_info is None:
+    if vin is None:
         return
+    vehicle = hass.data[DATA_KEY][vin]
     #async_add_entities([KamereonSwitch(discovery_info)])
 
 

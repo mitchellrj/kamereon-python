@@ -4,16 +4,17 @@ import logging
 from homeassistant.components.lock import LockDevice
 from homeassistant.const import STATE_UNKNOWN
 
-from . import KamereonEntity
+from . import DATA_KEY, KamereonEntity
 from .kamereon import Door, LockStatus
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_platform(hass, config, async_add_entities, vehicle=None):
+async def async_setup_platform(hass, config, async_add_entities, vin=None):
     """Set up the Kamereon lock."""
-    if vehicle is None:
+    if vin is None:
         return
+    vehicle = hass.data[DATA_KEY][vin]
 
     async_add_entities([KamereonLock(vehicle)])
 
