@@ -55,7 +55,7 @@ class ChargingStatusEntity(KamereonEntity, BinarySensorDevice):
     def device_state_attributes(self):
         a = KamereonEntity.device_state_attributes.fget(self)
         a.update({
-            'charging_speed': self.vehicle.charging_speed.value,
+            'charging_speed': self.vehicle.charging_speed.value if self.vehicle.charging_speed is not None else None,
             'last_updated': self.vehicle.battery_status_last_updated,
         })
         return a
